@@ -1,23 +1,23 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect} from "react";
+import { useDispatch, useSelector } from "react-redux";
+import MasterCart from "./Component/MasterCart";
+import ProductList from "./Component/ProductList";
+import { getTheProducts } from "./Redux/productCartReducer/ProductsAsync";
 
 function App() {
+//   const dispatch = useDispatch()
+//   useEffect(()=>{
+//     dispatch(getTheProducts())
+// }, [])
+  
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>INHERITX STORE
+
+
+      <MasterCart/>
+      <ProductList/>
+      </h1>
     </div>
   );
 }

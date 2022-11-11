@@ -6,7 +6,7 @@ import Modal from "@mui/material/Modal";
 import { IconButton } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useDispatch, useSelector } from "react-redux";
-import { removeItemFromCart } from "../Redux/productCartReducer/ProductCartSlice";
+import { removeItemFromCart, editQtyinCheckoutCart } from "../Redux/productCartReducer/ProductCartSlice";
 import { useEffect } from "react";
 import { useState } from "react";
 import { display } from "@mui/system";
@@ -16,7 +16,7 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: 600,
   bgcolor: "background.paper",
   border: "2px solid #000",
   boxShadow: 24,
@@ -29,24 +29,60 @@ export default function ModalCartPage({ open, handleOpen, handleClose }) {
     product: {products, cart, discount },
   } = useSelector((state) => state);
 
-
-
-  const [stateCart, setStateCart] = useState([]);
-  // console.log("modalCart", cart);
-  // console.log("modalProductCart>>>>>>>>>>>>>>>>>");
-
-  // console.log(cart?.map(el=>el.price)?.reduce((acc,cur)=>acc+cur, 0))
-  ///count logic
-  // let count = {};
-  // cart.forEach(function(el) {
-  //     count[el.title] = (count[el.title]||0) + 1;
-
-  // });
-  // console.log('count',count)
-  // console.log(Object.keys(count))
-  // let x = Object.assign({},l )
-
-  const removeElement = (itemID) => dispatch(removeItemFromCart(itemID));
+  const increaseItemQuantityCart=(items)=>{
+    let increasedCount = {...items, count: items.count + 1}
+    // console.log('+++',increasedCount);
+    if(increasedCount?.rating?.count< increasedCount?.count ){
+      alert('ITEM OUT OF STOCK ')
+      increasedCount =  {...items, count: items.count}
+    }
+    let discountPriceForItem; 
+    let discount = Math.round((increasedCount?.count/increasedCount?.rating?.count)*100)
+        if(discount>=90){
+          discountPriceForItem = 20
+        }
+        else if((discount>=50)&&(discount<90)){
+            discountPriceForItem = 10
+        }
+        else
+        {
+          discountPriceForItem = 5
+        }
+    let countIncrWithDiscount = {...increasedCount, discountPriceForItem}
+    dispatch(editQtyinCheckoutCart(countIncrWithDiscount))
+  }
+  const decreaseItemQuantityCart=(items)=>{
+    let decreasedCount = {...items, count: items?.count - 1}
+    if(decreasedCount?.count < 1){
+      // decreasedCount =  {...items, count: items.count-1}
+      if(window.confirm('Do you want to reove this Item ?..🤨')){
+        dispatch(removeItemFromCart(items.id))
+      }else{
+        decreasedCount = {...items, count: items?.count+1}
+        return  decreasedCount; 
+      }
+    }else{
+      let discountPriceForItem; 
+      let discount = Math.round((decreasedCount?.count/decreasedCount?.rating?.count)*100)
+          if(discount>=90){
+            discountPriceForItem = 20
+          }
+          else if((discount>=50)&&(discount<90)){
+              discountPriceForItem = 10
+          }
+          else
+          {
+            discountPriceForItem = 5
+          }
+      let countDecrWithDiscount = {...decreasedCount, discountPriceForItem}
+      dispatch(editQtyinCheckoutCart(countDecrWithDiscount))
+    }
+    
+  }
+  
+  const removeElement = (itemID) => {
+    dispatch(removeItemFromCart(itemID))
+  };
   return (
     <div>
       <Modal
@@ -65,11 +101,41 @@ export default function ModalCartPage({ open, handleOpen, handleClose }) {
                 key={i}
                 style={{ display: "flex", justifyContent: "space-between" }}
               >
-                <img src={el.image} width={40} />
+                  <div style={{display:"flex"}}>
+                    <div>
+                      <img src={el.image} width={40} />
+                    </div>
+                    <div style={{display:"flex"}}>
+                      <span>
+                         {el.title} <br/>
+                          
+                           <span>
+                           
+                            <Button variant="outlined" sx={{borderRadius:"100px"}}
+                              onClick={()=>increaseItemQuantityCart(el)}
+                            
+                            >+</Button>
+                              <span style={{padding:"10px"}}>{el.count}</span>
+                            <Button variant="outlined" sx={{borderRadius:"100px"}}
+                              onClick={()=>decreaseItemQuantityCart(el)}
+                            
+                            >-</Button>
+                          </span> 
+                          QTY:{el.count} <br/>
+                          <span style={{color:"blue", fontWeight:"bolder"}}>
+                            Discount :  {(el?.discountPriceForItem)}%👻
+                          </span>
+                          
+                          <span style={{marginLeft:"20px"}}>
+                            PRICE :  {el.price} * {el.count}  = ${el.price * el.count}
+                          </span>
+                          
+                      </span>
 
-                <div>{el.title}</div>
+                    </div>
+                  </div>
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <div style={{}}>${el.price}</div>
+                  <div>${el.price * el.count }</div>
                   <IconButton onClick={() => removeElement(el.id)}>
                     <CancelIcon />
                   </IconButton>
@@ -82,15 +148,49 @@ export default function ModalCartPage({ open, handleOpen, handleClose }) {
               component="h2"
               sx={{ display: "flex", justifyContent: "space-between" }}
             >
-              <span>{"TOTAL"}</span>
+              <span>{"TOTAL"} 
+              </span>
               <span>
                 $
                 {cart
                   ?.map((el) => el.price)
                   ?.reduce((acc, cur) => acc + cur, 0)?.toFixed(2)}
+                  😒
               </span>
             </Typography>
-          </Box>
+            <Typography
+              id="modal-modal-description"
+              variant="h6"
+              component="p"
+            >
+              Total discount in your Item: 
+              {cart
+                  ?.map((el) => el?.discountPriceForItem)
+                  ?.reduce((acc, cur) => acc + cur, 0)
+                }% 
+            </Typography>
+
+            <span>
+            <Typography
+              id="modal-modal-description"
+              variant="h6"
+              component="p"
+              >
+
+              Amount to be paid after Discount :    😎 
+            {
+            (cart
+              ?.map((el) => el?.price)
+              ?.reduce((acc, cur) => acc + cur, 0)?.toFixed(2))-           
+            parseFloat(cart
+                  ?.map((el) => el?.discountPriceForItem)
+                  ?.reduce((acc, cur) => acc + cur, 0)
+                )/100  } $ only ... 😎
+
+            </Typography>
+
+            </span>
+          </Box> 
         ) : (
           <Box sx={style}>
             <Typography

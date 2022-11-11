@@ -12,12 +12,15 @@ function App() {
   
   return (
     <div className="App">
-      <h1>INHERITX STORE
-
-
-      <MasterCart/>
-      <ProductList/>
+      <div style={{display:"flex", justifyContent:"center", marginTop:"15px"}}>
+      < h1>INHERITX STORE
       </h1>
+      <MasterCart/>
+
+      </div>
+
+
+      <ProductList/>
     </div>
   );
 }

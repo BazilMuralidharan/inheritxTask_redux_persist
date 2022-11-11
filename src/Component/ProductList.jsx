@@ -49,25 +49,28 @@ export default function ProductList(){
     return(
         <ProductContainer>
 
-            {products?.map((el,i)=>(
-                
-                //   <div key={i}>
-                    <Card sx={{ maxWidth: 345 , height:"auto", display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"0px"}} key={i}>
-
-                    
+            {products?.map((el,i)=>
+              
+            (
+                    <div 
+                      sx={{
+                         maxWidth: 345 , 
+                         height:"auto", 
+                         
+                         display:"flex", 
+                         flexDirection:"column", 
+                         justifyContent:"space-between", 
+                         padding:"0px"}} 
+                         key={i}
+                    >
                     <ProductCard 
                         title={el.title}
                         price={el.price}
                         image ={el.image}
-    
+                        rating = {el.rating}
+                        data = {el}
                     />
-                    <Button variant='contained' onClick={()=>addItem(el)}>Add to Cart</Button>
-
-                    {/* <Button onClick={increement}>+</Button>
-                    <span>{count}</span>
-                    <Button onClick={decreement}>-</Button> */}
-                   {/* </div> */}
-                   </Card>
+                   </div>
                 
             ))}
         </ProductContainer>
